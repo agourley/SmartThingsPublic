@@ -26,7 +26,7 @@ definition(
 
 preferences {
 	section("When water is sensed...") {
-		input "sensor", "capability.waterSensor", title: "Where?", required: true
+		input "sensor", "capability.waterSensor", title: "Where?", required: true, multiple: true
 	}
 	section("Turn off a water switch...") {
 		input "water", "capability.switch", title: "Which?", required: true
