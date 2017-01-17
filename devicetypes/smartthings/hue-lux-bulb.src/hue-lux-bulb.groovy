@@ -14,6 +14,7 @@ metadata {
 		capability "Switch"
 		capability "Refresh"
 		capability "Sensor"
+        capability "Health Check"
 
         command "refresh"
 	}
@@ -33,9 +34,6 @@ metadata {
             tileAttribute ("device.level", key: "SLIDER_CONTROL") {
               attributeState "level", action:"switch level.setLevel", range:"(0..100)"
             }
-            tileAttribute ("device.level", key: "SECONDARY_CONTROL") {
-	            attributeState "level", label: 'Level ${currentValue}%'
-			}
         }
 
         controlTile("levelSliderControl", "device.level", "slider", height: 1, width: 2, inactiveLabel: false, range:"(0..100)") {
@@ -49,6 +47,10 @@ metadata {
         main(["rich-control"])
         details(["rich-control", "refresh"])
     }
+}
+
+void installed() {
+	sendEvent(name: "DeviceWatch-Enroll", value: "{\"protocol\": \"LAN\", \"scheme\":\"untracked\", \"hubHardwareId\": \"${device.hub.hardwareID}\"}")
 }
 
 // parse events into attributes
@@ -71,20 +73,16 @@ def parse(description) {
 // handle commands
 void on() {
 	log.trace parent.on(this)
-	sendEvent(name: "switch", value: "on")
 }
 
 void off() {
 	log.trace parent.off(this)
-	sendEvent(name: "switch", value: "off")
 }
 
 void setLevel(percent) {
 	log.debug "Executing 'setLevel'"
     if (percent != null && percent >= 0 && percent <= 100) {
 		parent.setLevel(this, percent)
-		sendEvent(name: "level", value: percent)
-		sendEvent(name: "switch", value: "on")
 	} else {
     	log.warn "$percent is not 0-100"
     }
@@ -94,3 +92,4 @@ void refresh() {
 	log.debug "Executing 'refresh'"
 	parent.manualRefresh()
 }
+
